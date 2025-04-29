@@ -1,6 +1,5 @@
 import NextAuth from 'next-auth';
 import Twitch from 'next-auth/providers/twitch';
-// import TwitchProvider from 'next-auth/providers/twitch';
 
 // if (process.env['AUTH_TWITCH_ID'] == null || process.env['AUTH_TWITCH_SECRET'] == null) {
 //   throw new Error('AUTH_TWITCH_ID or AUTH_TWITCH_SECRET is not defined');
@@ -25,7 +24,6 @@ declare module 'next-auth' {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const { handlers, signIn, signOut, auth } = NextAuth({
   // providers: [
   //   TwitchProvider({
@@ -57,14 +55,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // token から値を取得して session に設定
       session.accessToken = typeof token['accessToken'] === 'string' ? token['accessToken'] : '';
       return session;
-
-      // return {
-      //   ...session,
-      //   user: {
-      //     ...session.user,
-      //     accessToken: token['accessToken'] as string,
-      //   },
-      // };
     },
   },
 });

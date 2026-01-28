@@ -12,6 +12,7 @@ export const ConfirmLogin = async (): Promise<React.JSX.Element> => {
         <div>
           <p>signed in as {session?.user?.name}</p>
           <pre>{JSON.stringify(session, null, 2)}</pre>
+          <SignOut />
         </div>
       ) : (
         <div>
@@ -19,7 +20,6 @@ export const ConfirmLogin = async (): Promise<React.JSX.Element> => {
           <SignIn />
         </div>
       )}
-      <SignOut />
     </div>
   );
 };

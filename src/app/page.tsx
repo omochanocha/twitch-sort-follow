@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { auth } from '@/auth';
 
 import { ConfirmLogin } from './components/ConfirmLogin';
+import { ShowId } from './components/showId';
 
 // TODO ログインしたらユーザー名でtoken取得からやる
 // ここのIDは認証で取得したOauth tokenに含まれるuser IDと一致していないとだめ
@@ -18,10 +19,9 @@ import { ConfirmLogin } from './components/ConfirmLogin';
 // const URL = `https://api.twitch.tv/helix/channels/followed?user_id=${ID}`;
 
 export default async function Home(): Promise<React.JSX.Element> {
-  // const params = useParams();
-  // console.log(params);
-
   const session = await auth();
+  // console.log(session?.user.id);
+  // 5b67792e-9691-4e00-a96c-7d79c0bdff13
 
   // if (session == null || session.user == null) {
   //   return <p>セッションがnullです</p>;
@@ -56,6 +56,7 @@ export default async function Home(): Promise<React.JSX.Element> {
   return (
     <div className="grid min-h-screen place-content-center gap-16 p-8 pb-20 font-[family-name:var(--font-geist-sans)] sm:p-20">
       <main className="flex flex-col items-center gap-[32px] sm:items-start">
+        {session != null && <ShowId />}
         <ConfirmLogin />
         {session != null && session.user.image != null && (
           <Image src={session.user.image} width={40} height={40} alt="" />

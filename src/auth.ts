@@ -3,34 +3,21 @@ import Twitch from 'next-auth/providers/twitch';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [Twitch],
-  // callbacks: {
-  // jwt({ token, account }) {
-  //   if (account) {
-  //     token['accessToken'] = account.access_token;
-  //   }
-  //   return token;
-  // },
-  // session({ session, token }) {
-  //   session.sessionToken = typeof token['accessToken'] === 'string' ? token['accessToken'] : '';
-  //   return session;
-  // },
-  // jwt({ token, account, trigger }) {
-  //   // このtriggerは何？
-  //   if (trigger === 'signIn' && account?.access_token != null) {
-  //     token['accessToken'] = account.access_token;
-  //   }
-  //   return token;
-  // },
-  // session({ session, token }) {
-  //   // token から値を取得して session に設定
-  //   session.accessToken = typeof token['accessToken'] === 'string' ? token['accessToken'] : '';
-  //   return session;
-  // },
-  // session({ token, session }) {
-  //   // if (token) {
-  //   //   session.user.id = token.id;
-  //   // }
-  //   return session;
-  // },
-  // },
+  session: { strategy: 'jwt' },
+  callbacks: {
+    jwt({ token, account }) {
+      // サインイン直後だけ account が来る
+      if (account?.provider === 'twitch') {
+        token['twitchUserId'] = account.providerAccountId;
+        token['twitchAccessToken'] = account.access_token; // 後でAPI叩くなら保持
+      }
+      return token;
+    },
+
+    session({ token, session }) {
+      session.user.id = token['twitchUserId'] as string;
+      session.user.token = token['twitchAccessToken'] as string;
+      return session;
+    },
+  },
 });

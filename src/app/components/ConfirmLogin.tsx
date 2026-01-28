@@ -5,7 +5,6 @@ import { SignOut } from './SignOut';
 
 export const ConfirmLogin = async (): Promise<React.JSX.Element> => {
   const session = await auth();
-  console.log(session);
 
   return (
     <div>

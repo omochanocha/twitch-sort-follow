@@ -10,6 +10,7 @@ import { auth } from '@/auth';
 
 import { ConfirmLogin } from './components/ConfirmLogin';
 
+// TODO ログインしたらユーザー名でtoken取得からやる
 // ここのIDは認証で取得したOauth tokenに含まれるuser IDと一致していないとだめ
 // const ID = '154677733'; // 自分
 

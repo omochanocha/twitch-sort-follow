@@ -2,7 +2,15 @@ import NextAuth from 'next-auth';
 import Twitch from 'next-auth/providers/twitch';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-  providers: [Twitch],
+  providers: [
+    Twitch({
+      authorization: {
+        params: {
+          scope: 'openid user:read:email user:read:follows',
+        },
+      },
+    }),
+  ],
   session: { strategy: 'jwt' },
   callbacks: {
     jwt({ token, account }) {

@@ -17,14 +17,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // サインイン直後だけ account が来る
       if (account?.provider === 'twitch') {
         token['twitchUserId'] = account.providerAccountId;
-        token['twitchAccessToken'] = account.access_token; // 後でAPI叩くなら保持
+        token['twitchAccessToken'] = account.access_token as string;
       }
+      // ここで返したtokenが下のsessionの引数のtokenとして使われる
       return token;
     },
 
     session({ token, session }) {
       session.user.id = token['twitchUserId'] as string;
-      session.user.token = token['twitchAccessToken'] as string;
       return session;
     },
   },

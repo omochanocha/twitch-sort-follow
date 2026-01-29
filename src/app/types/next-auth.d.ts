@@ -5,7 +5,6 @@ declare module 'next-auth' {
     user: DefaultSession['user'] & {
       // 追加の型定義を書ける
       id: string;
-      token: string;
     };
   }
 }

@@ -15,6 +15,7 @@ export const GetFollows: React.FC = async () => {
     },
   });
 
+  // ログイン後じゃないとだめ
   const raw = await res.json();
   const data = FollowsResponseSchema.parse(raw);
 

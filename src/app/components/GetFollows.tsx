@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 
-import { FollowsResponse, FollowsResponseSchema } from '../types';
+import { FollowsResponseSchema } from '../types';
 
 export const GetFollows: React.FC = async () => {
   // route handler側でsession情報が取れないのでcookieを渡す
@@ -14,8 +14,9 @@ export const GetFollows: React.FC = async () => {
       cookie: cookieHeader,
     },
   });
-  const json: unknown = await res.json();
-  const data: FollowsResponse = FollowsResponseSchema.parse(json);
+
+  const raw = await res.json();
+  const data = FollowsResponseSchema.parse(raw);
 
   console.log(data);
 

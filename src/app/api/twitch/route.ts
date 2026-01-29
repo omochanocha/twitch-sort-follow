@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-import { FollowsResponse, FollowsResponseSchema } from '@/app/types';
-
 export const GET = async (req: NextRequest): Promise<NextResponse<unknown>> => {
   try {
     const token = await getToken({ req, secret: process.env['NEXTAUTH_SECRET']! });
@@ -22,9 +20,13 @@ export const GET = async (req: NextRequest): Promise<NextResponse<unknown>> => {
         },
       },
     );
-    const json: unknown = await res.json();
-    const body: FollowsResponse = FollowsResponseSchema.parse(json);
-    return NextResponse.json(body, { status: 200 });
+
+    if (!res.ok) {
+      throw new Error(`API error ${res.status}`);
+    }
+
+    const raw = await res.json();
+    return NextResponse.json(raw, { status: 200 });
   } catch (err) {
     return NextResponse.json(err, { status: 500 });
   }

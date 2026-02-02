@@ -14,7 +14,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     twitchUserId?: string;
     twitchAccessToken?: string;
-    twitchRefreshToken?: string;
+    twitchRefreshToken?: string | undefined;
     twitchAccessTokenExpires?: number;
     twitchError?: 'RefreshFailed' | undefined;
   }

@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 
+import { API_BASE_URL } from '../constants';
 import { FollowsResponseSchema } from '../types';
 
 export const GetFollows: React.FC<{ after: string }> = async ({ after = '' }) => {
@@ -9,7 +10,13 @@ export const GetFollows: React.FC<{ after: string }> = async ({ after = '' }) =>
     .map((c) => `${c.name}=${c.value}`)
     .join('; ');
 
-  const res = await fetch(`http://localhost:3000/api/twitch?after=${after}`, {
+  const url = new URL(`${API_BASE_URL}/api/twitch`);
+  console.log(after);
+  if (after != null && after !== '') {
+    url.searchParams.set('after', after);
+  }
+
+  const res = await fetch(url.toString(), {
     headers: {
       cookie: cookieHeader,
     },

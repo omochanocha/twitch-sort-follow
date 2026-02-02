@@ -4,17 +4,15 @@ import Twitch from 'next-auth/providers/twitch';
 const TOKEN_REFRESH_BUFFER_MS = 60000;
 
 async function refreshTwitchAccessToken(refreshToken: string) {
-  const body = new URLSearchParams({
-    grant_type: 'refresh_token',
-    refresh_token: refreshToken,
-    client_id: process.env['AUTH_TWITCH_ID']!,
-    client_secret: process.env['AUTH_TWITCH_SECRET']!,
-  });
-
   const res = await fetch('https://id.twitch.tv/oauth2/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString(),
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+      client_id: process.env['AUTH_TWITCH_ID']!,
+      client_secret: process.env['AUTH_TWITCH_SECRET']!,
+    }),
   });
 
   const json = await res.json();

@@ -5,19 +5,20 @@ import { useEffect } from 'react';
 import { signOut, useSession } from 'next-auth/react';
 
 export const AutoRefreshSession = (): null => {
-  const { data, update } = useSession();
+  const { data: session, update } = useSession();
 
-  useEffect(() => {
-    const id = setInterval(() => update(), 5 * 60_000);
-    return () => clearInterval(id);
-  }, [update]);
+  // 5分毎に更新
+  // useEffect(() => {
+  //   const id = setInterval(() => update(), 5 * TOKEN_REFRESH_BUFFER_MS);
+  //   return () => clearInterval(id);
+  // }, [update]);
 
   // refresh失敗したら自動サインアウト（任意）
   useEffect(() => {
-    if (data?.twitchError === 'RefreshFailed') {
+    if (session?.twitchError === 'RefreshFailed') {
       void signOut({ redirectTo: '/login' });
     }
-  }, [data]);
+  }, [session]);
 
   return null;
 };

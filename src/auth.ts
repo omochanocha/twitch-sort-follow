@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import Twitch from 'next-auth/providers/twitch';
 
-const TOKEN_REFRESH_BUFFER_MS = 60000;
+import { TOKEN_REFRESH_BUFFER_MS } from './app/constants';
 
 async function refreshTwitchAccessToken(refreshToken: string) {
   const res = await fetch('https://id.twitch.tv/oauth2/token', {
@@ -48,12 +48,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.twitchRefreshToken = account.refresh_token;
 
         // expires_at(秒, いつ切れるか) or expires_in(秒、あと何秒で切れるか)
-        // Date.now()がms単位かつ公式サンプルがmsなのでms合わせる
+        // Date.now()がms単位かつ公式サンプルがmsなのでmsに合わせる
         const expiresMs =
           account.expires_at != null && account.expires_at
             ? account.expires_at * 1000
             : Date.now() + (account.expires_in ?? 0) * 1000;
         token.twitchAccessTokenExpires = expiresMs;
+        token.twitchError = undefined;
 
         return token;
       }
@@ -64,7 +65,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         typeof token.twitchAccessTokenExpires === 'number' &&
         Date.now() < token.twitchAccessTokenExpires - TOKEN_REFRESH_BUFFER_MS
       ) {
-        token.twitchError = 'RefreshFailed';
         return token;
       }
 

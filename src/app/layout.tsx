@@ -1,4 +1,7 @@
 import { Noto_Sans_JP } from 'next/font/google';
+import { SessionProvider } from 'next-auth/react';
+
+import { AutoRefreshSession } from './components/AutoRefreshSession';
 
 import type { Metadata } from 'next';
 
@@ -20,8 +23,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>): React.JSX.Element {
   return (
-    <html lang="ja">
-      <body className={`${notoSansJP.className} antialiased`}>{children}</body>
-    </html>
+    <SessionProvider>
+      <html lang="ja">
+        <AutoRefreshSession />
+        <body className={`${notoSansJP.className} antialiased`}>{children}</body>
+      </html>
+    </SessionProvider>
   );
 }

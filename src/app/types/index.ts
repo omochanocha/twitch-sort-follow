@@ -12,8 +12,9 @@ export type FollowsChannel = z.infer<typeof FollowsChannelSchema>;
 export const FollowsResponseSchema = z.object({
   data: FollowsChannelSchema.array(),
   pagination: z.object({
-    cursor: z.string(),
+    cursor: z.string().optional(),
   }),
+  total: z.number(),
 });
 
 export type FollowsResponse = z.infer<typeof FollowsResponseSchema>;

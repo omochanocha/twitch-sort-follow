@@ -11,8 +11,6 @@ export default async function LoginPage(): Promise<React.JSX.Element> {
       <div>loginページ</div>
       {session != null ? (
         <div>
-          <p>signed in as {session?.user?.name}</p>
-          <pre>{JSON.stringify(session, null, 2)}</pre>
           <SignOut />
         </div>
       ) : (

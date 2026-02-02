@@ -1,33 +1,59 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-export const GET = async (req: NextRequest): Promise<NextResponse<unknown>> => {
+// トークンをフロントに出したくないのでRoute Handlerを使用
+export const GET = async (req: NextRequest): Promise<NextResponse> => {
   try {
     const token = await getToken({ req, secret: process.env['NEXTAUTH_SECRET']! });
+
+    if (!token) {
+      return NextResponse.json(
+        { ok: false, where: 'getToken', reason: 'no token (cookie missing/expired)' },
+        { status: 401 },
+      );
+    }
+
     const userId = token?.twitchUserId;
     const accessToken = token?.twitchAccessToken;
 
     if (userId == null || accessToken == null) {
-      return NextResponse.json('Unauthorized', { status: 401 });
+      return NextResponse.json(
+        { ok: false, where: 'token', reason: 'missing twitchUserId/twitchAccessToken' },
+        { status: 401 },
+      );
     }
 
-    const res = await fetch(
-      `https://api.twitch.tv/helix/channels/followed?user_id=${encodeURIComponent(userId)}`,
-      {
-        headers: {
-          'Client-Id': process.env['AUTH_TWITCH_ID']!,
-          Authorization: `Bearer ${accessToken}`,
-        },
+    const { searchParams } = new URL(req.url);
+    const after = searchParams.get('after');
+
+    const url = new URL('https://api.twitch.tv/helix/channels/followed');
+    url.searchParams.set('user_id', userId);
+    url.searchParams.set('first', '20');
+    if (after != null) url.searchParams.set('after', after);
+
+    const res = await fetch(url.toString(), {
+      headers: {
+        'Client-Id': process.env['AUTH_TWITCH_ID']!,
+        Authorization: `Bearer ${accessToken}`,
       },
-    );
+    });
 
     if (!res.ok) {
-      throw new Error(`API error ${res.status}`);
+      const body = await res.text();
+
+      const status = res.status;
+      return NextResponse.json(
+        { ok: false, where: 'twitch', status, body },
+        { status: status === 401 || status === 403 ? 401 : 502 },
+      );
     }
 
     const raw = await res.json();
+    // return await res.json();
+
     return NextResponse.json(raw, { status: 200 });
   } catch (err) {
-    return NextResponse.json(err, { status: 500 });
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json({ ok: false, where: 'server', message }, { status: 500 });
   }
 };

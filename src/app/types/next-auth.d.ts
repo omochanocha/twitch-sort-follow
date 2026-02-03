@@ -6,7 +6,7 @@ declare module 'next-auth' {
       // 追加の型定義を書ける
       id: string;
     };
-    twitchError?: string | undefined;
+    twitchError?: 'RefreshFailed' | undefined;
   }
 }
 
@@ -14,7 +14,7 @@ declare module 'next-auth/jwt' {
   interface JWT {
     twitchUserId?: string;
     twitchAccessToken?: string;
-    twitchRefreshToken?: string | undefined;
+    twitchRefreshToken?: string;
     twitchAccessTokenExpires?: number;
     twitchError?: 'RefreshFailed' | undefined;
   }

@@ -11,7 +11,6 @@ export const GetFollows: React.FC<{ after: string }> = async ({ after = '' }) =>
     .join('; ');
 
   const url = new URL(`${API_BASE_URL}/api/twitch`);
-  console.log(after);
   if (after != null && after !== '') {
     url.searchParams.set('after', after);
   }

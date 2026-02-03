@@ -45,7 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (account?.provider === 'twitch') {
         token.twitchUserId = account.providerAccountId;
         token.twitchAccessToken = account.access_token as string;
-        token.twitchRefreshToken = account.refresh_token;
+        token.twitchRefreshToken = account.refresh_token!;
 
         // expires_at(秒, いつ切れるか) or expires_in(秒、あと何秒で切れるか)
         // Date.now()がms単位かつ公式サンプルがmsなのでmsに合わせる

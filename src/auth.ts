@@ -1,7 +1,7 @@
 import NextAuth from 'next-auth';
 import Twitch from 'next-auth/providers/twitch';
 
-import { TOKEN_REFRESH_BUFFER_MS } from './app/constants';
+import { TOKEN_REFRESH_BUFFER_MS } from './constants';
 
 async function refreshTwitchAccessToken(refreshToken: string) {
   const res = await fetch('https://id.twitch.tv/oauth2/token', {

@@ -1,4 +1,5 @@
 import { signOut } from '@/auth';
+import { Button } from '@/components/ui/button';
 
 export const SignOut = (): React.JSX.Element => {
   return (
@@ -8,12 +9,9 @@ export const SignOut = (): React.JSX.Element => {
         await signOut({ redirectTo: '/login' });
       }}
     >
-      <button
-        type="submit"
-        className="rounded bg-red-500 px-4 py-2 font-bold text-white hover:bg-red-700"
-      >
+      <Button type="submit" variant={'secondary'} size={'lg'}>
         Sign Out
-      </button>
+      </Button>
     </form>
   );
 };

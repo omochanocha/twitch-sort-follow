@@ -24,11 +24,12 @@ export const GET = async (req: NextRequest): Promise<NextResponse> => {
     }
 
     const { searchParams } = new URL(req.url);
+    const first = searchParams.get('first');
     const after = searchParams.get('after');
 
     const url = new URL('https://api.twitch.tv/helix/channels/followed');
     url.searchParams.set('user_id', userId);
-    url.searchParams.set('first', '20');
+    if (first != null && first !== '') url.searchParams.set('first', first);
     if (after != null && after !== '') url.searchParams.set('after', after);
 
     const res = await fetch(url.toString(), {

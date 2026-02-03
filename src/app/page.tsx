@@ -1,9 +1,6 @@
 import React from 'react';
 
-import Link from 'next/link';
-
-import { GetFollows } from './components/GetFollows';
-import { SignOut } from './components/SignOut';
+import { GetFollows } from '../components/GetFollows';
 
 export default function Home(): React.JSX.Element {
   return (
@@ -11,8 +8,6 @@ export default function Home(): React.JSX.Element {
       <main className="flex flex-col items-center gap-[32px] sm:items-start">
         {/* <ConfirmLogin /> */}
         <GetFollows after="" />
-        <SignOut />
-        <Link href="/">HOME</Link>
       </main>
     </div>
   );

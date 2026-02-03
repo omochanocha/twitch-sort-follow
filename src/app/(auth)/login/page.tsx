@@ -1,7 +1,7 @@
 import { auth } from '@/auth';
 
-import { SignIn } from '@/app/components/SignIn';
-import { SignOut } from '@/app/components/SignOut';
+import { SignIn } from '@/components/SignIn';
+import { SignOut } from '@/components/SignOut';
 
 export default async function LoginPage(): Promise<React.JSX.Element> {
   const session = await auth();

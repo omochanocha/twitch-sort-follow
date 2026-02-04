@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 
 import { API_BASE_URL } from '../constants';
 import { FollowsResponseSchema } from '../types';
+import { ShowFollowChannel } from './ShowFollowChannel';
 
 export const GetFollows: React.FC<{ after: string }> = async ({ after = '' }) => {
   // route handler側でsession情報が取れないのでcookieを渡す
@@ -26,24 +27,13 @@ export const GetFollows: React.FC<{ after: string }> = async ({ after = '' }) =>
 
   // ログイン後じゃないとだめ
   const raw = await res.json();
-  console.log(raw);
   const data = FollowsResponseSchema.parse(raw);
 
   return (
-    <div>
-      <div>
-        {data.data.map((user) => (
-          <div key={user.broadcaster_id}>
-            <a
-              href={`https://www.twitch.tv/${user.broadcaster_login}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {user.broadcaster_name}
-            </a>
-          </div>
-        ))}
-      </div>
-    </div>
+    <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(350px,100%),1fr))] gap-5">
+      {data.data.map((channel) => (
+        <ShowFollowChannel channel={channel} key={channel.broadcaster_id} />
+      ))}
+    </ul>
   );
 };

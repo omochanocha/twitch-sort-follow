@@ -1,14 +1,20 @@
-'use client';
+import { FollowsChannel } from '@/types';
 
-import { useState } from 'react';
+import { Card, CardTitle } from './ui/card';
 
-import { FollowsChannel } from '../types';
-
-export const ShowFollowChannel: React.FC = () => {
-  const [followChannel, setFollowChannel] = useState<FollowsChannel[]>([]);
+export const ShowFollowChannel: React.FC<{ channel: FollowsChannel }> = ({ channel }) => {
   return (
-    <div>
-      <p>clientコンポーネントで取得したsession</p>
-    </div>
+    <li>
+      <Card className="overflow-hidden rounded-3xl">
+        <a
+          href={`https://www.twitch.tv/${channel.broadcaster_login}`}
+          target="_blank"
+          rel="noreferrer"
+          className="grid p-4 hover:opacity-50"
+        >
+          <CardTitle>{channel.broadcaster_name}</CardTitle>
+        </a>
+      </Card>
+    </li>
   );
 };

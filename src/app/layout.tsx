@@ -31,7 +31,7 @@ export default function RootLayout({
       <html lang="ja" suppressHydrationWarning>
         <AutoRefreshSession />
         <body
-          className={`${notoSansJP.className} bg-indigo-100 antialiased dark:bg-background dark:text-foreground`}
+          className={`${notoSansJP.className} grid min-h-svh grid-rows-[auto_1fr] bg-indigo-100 antialiased dark:bg-background dark:text-foreground`}
         >
           <ThemeProvider
             attribute="class"
@@ -40,7 +40,7 @@ export default function RootLayout({
             disableTransitionOnChange
           >
             <Header />
-            <main>{children}</main>
+            <main className="py-8">{children}</main>
           </ThemeProvider>
         </body>
       </html>

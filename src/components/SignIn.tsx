@@ -1,5 +1,8 @@
 import { signIn } from '@/auth';
 
+import { Icon } from './Icon';
+import { Button } from './ui/button';
+
 export const SignIn = (): React.JSX.Element => {
   return (
     <form
@@ -8,12 +11,15 @@ export const SignIn = (): React.JSX.Element => {
         await signIn('twitch');
       }}
     >
-      <button
+      <Button
         type="submit"
-        className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+        variant={'secondary'}
+        size={'default'}
+        className="font-medium leading-relaxed tracking-wider [&_svg]:size-5"
       >
-        Sign in with Twitch
-      </button>
+        <Icon.twitch className="" />
+        SignIn
+      </Button>
     </form>
   );
 };

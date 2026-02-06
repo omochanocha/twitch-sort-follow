@@ -31,7 +31,7 @@ export default function RootLayout({
       <html lang="ja" suppressHydrationWarning>
         <AutoRefreshSession />
         <body
-          className={`${notoSansJP.className} grid min-h-svh grid-rows-[auto_1fr] bg-indigo-100 antialiased dark:bg-background dark:text-foreground`}
+          className={`${notoSansJP.className} grid min-h-svh grid-rows-[auto_1fr] bg-slate-100 antialiased dark:bg-background dark:text-foreground`}
         >
           <ThemeProvider
             attribute="class"

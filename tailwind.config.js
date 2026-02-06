@@ -28,8 +28,9 @@ export default {
           foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
+          DEFAULT: 'hsla(var(--secondary))',
           foreground: 'hsl(var(--secondary-foreground))',
+          hover: 'hsla(var(--secondary-hover))',
         },
         muted: {
           DEFAULT: 'hsl(var(--muted))',

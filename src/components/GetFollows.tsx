@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { notFound } from 'next/navigation';
 
 import { API_BASE_URL } from '../constants';
 import { FollowsResponseSchema } from '../types';
@@ -27,13 +28,11 @@ export const GetFollows: React.FC<{ after: string }> = async ({ after = '' }) =>
 
   // ログイン後じゃないとだめ
   const raw = await res.json();
+  if (raw == null) {
+    notFound();
+  }
   const data = FollowsResponseSchema.parse(raw);
+  const followChannel = data.data;
 
-  return (
-    <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(350px,100%),1fr))] gap-5">
-      {data.data.map((channel) => (
-        <ShowFollowChannel channel={channel} key={channel.broadcaster_id} />
-      ))}
-    </ul>
-  );
+  return <ShowFollowChannel initialData={followChannel} />;
 };

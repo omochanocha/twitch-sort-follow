@@ -4,14 +4,16 @@ import { useEffect } from 'react';
 
 import { signOut, useSession } from 'next-auth/react';
 
+import { TOKEN_REFRESH_BUFFER_MS } from '@/constants';
+
 export const AutoRefreshSession = (): null => {
   const { data: session, update } = useSession();
 
   // 5分毎に更新
-  // useEffect(() => {
-  //   const id = setInterval(() => update(), 5 * TOKEN_REFRESH_BUFFER_MS);
-  //   return () => clearInterval(id);
-  // }, [update]);
+  useEffect(() => {
+    const id = setInterval(() => update(), 5 * TOKEN_REFRESH_BUFFER_MS);
+    return () => clearInterval(id);
+  }, [update]);
 
   // refresh失敗したら自動サインアウト（任意）
   useEffect(() => {

@@ -1,18 +1,18 @@
 // export { auth as middleware } from '@/auth';
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
+import { NextResponse } from 'next/server';
 
 import { auth } from '@/auth';
 
-export default auth(async function middleware(req: NextRequest) {
+export default auth(function middleware(req) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/strict-boolean-expressions, @typescript-eslint/no-unsafe-member-access
   console.log('has req.auth?', !!(req as any).auth);
   console.log('pathname', req.nextUrl.pathname);
 
-  const token = await getToken({ req, secret: process.env['NEXTAUTH_SECRET']! });
-  console.log('getToken()', token ? 'HAS_TOKEN' : 'NO_TOKEN');
-  const isAuth = !!token;
+  // const token = await getToken({ req, secret: process.env['NEXTAUTH_SECRET']! });
+  // console.log('getToken()', token ? 'HAS_TOKEN' : 'NO_TOKEN');
+  // const isAuth = !!token;
+  const isAuth = !!req.auth;
   const isAuthPage = req.nextUrl.pathname.startsWith('/login');
 
   if (isAuthPage) {

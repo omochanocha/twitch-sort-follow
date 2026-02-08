@@ -28,6 +28,10 @@ export const GetFollows: React.FC<{ after: string }> = async ({ after = '' }) =>
 
   // ログイン後じゃないとだめ
   const raw = await res.json();
+  if (!res.ok) {
+    // raw.body や raw.reason をログに出す
+    throw new Error(JSON.stringify(raw));
+  }
   if (raw == null) {
     notFound();
   }

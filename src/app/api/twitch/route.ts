@@ -4,6 +4,8 @@ import { getToken } from 'next-auth/jwt';
 // トークンをフロントに出したくないのでRoute Handlerを使用
 export const GET = async (req: NextRequest): Promise<NextResponse> => {
   try {
+    console.log('cookie header?', req.headers.get('cookie') != null ? 'YES' : 'NO');
+
     const token = await getToken({ req, secret: process.env['NEXTAUTH_SECRET']! });
 
     if (!token) {

@@ -8,7 +8,7 @@ export const SignIn = (): React.JSX.Element => {
     <form
       action={async () => {
         'use server';
-        await signIn('twitch');
+        await signIn('twitch', { redirectTo: '/' });
       }}
     >
       <Button

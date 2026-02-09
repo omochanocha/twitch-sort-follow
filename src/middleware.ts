@@ -13,14 +13,14 @@ export default auth(function middleware(req) {
       return NextResponse.redirect(new URL('/', req.url));
     }
 
-    return null;
+    return NextResponse.next();
   }
 
   if (!isAuth) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  return null;
+  return NextResponse.next();
 });
 
 export const config = {

@@ -18,7 +18,7 @@ import {
 
 type SortKey = 'followd_desc' | 'followd_asc' | 'name_desc' | 'name_asc';
 
-// オプションがDRYになる、あと何回も比較するのに毎回比較器（比較する環境的なもの？）を作らなくて良くなる
+// Collatorを作るとオプションがDRYになる、あと何回も比較するのに毎回比較器（比較する環境的なもの？）を作らなくて良くなる
 const collator = new Intl.Collator('ja', { numeric: true, sensitivity: 'base' });
 
 export const ShowFollowChannel: React.FC<{ initialData: FollowsChannel[] }> = ({ initialData }) => {
@@ -49,15 +49,15 @@ export const ShowFollowChannel: React.FC<{ initialData: FollowsChannel[] }> = ({
   return (
     <div className="grid gap-y-4">
       <Select onValueChange={(e: SortKey) => handleOnChange(e)}>
-        <SelectTrigger className="w-1/4">
+        <SelectTrigger className="w-1/2 sm:w-full sm:max-w-60">
           <SelectValue placeholder="並び替えオプション" />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
             <SelectItem value="followd_desc">フォローの新しい順</SelectItem>
             <SelectItem value="followd_asc">フォローの古い順</SelectItem>
-            <SelectItem value="name_desc">あいうえお順</SelectItem>
-            <SelectItem value="name_asc">あいうえお逆順</SelectItem>
+            <SelectItem value="name_desc">アルファベット順</SelectItem>
+            <SelectItem value="name_asc">アルファベット逆順</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>

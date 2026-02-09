@@ -6,11 +6,13 @@ export const GET = async (req: NextRequest): Promise<NextResponse> => {
   try {
     console.log('cookie header?', req.headers.get('cookie') != null ? 'YES' : 'NO');
 
-    const cookieName = req.cookies.get('__secure-authjs.session-token')
-      ? '__secure-authjs.session-token'
+    const cookieName = req.cookies.get('__Secure-authjs.session-token')
+      ? '__Secure-authjs.session-token'
       : req.cookies.get('authjs.session-token')
         ? 'authjs.session-token'
         : undefined;
+
+    console.log(`cookieName: ${cookieName}`);
 
     const token = await getToken({
       req,

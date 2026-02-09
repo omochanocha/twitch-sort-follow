@@ -4,16 +4,14 @@ import { getToken } from 'next-auth/jwt';
 // トークンをフロントに出したくないのでRoute Handlerを使用
 export const GET = async (req: NextRequest): Promise<NextResponse> => {
   try {
-    console.log('cookie header?', req.headers.get('cookie') != null ? 'YES' : 'NO');
-
     const cookieName = req.cookies.get('__Secure-authjs.session-token')
       ? '__Secure-authjs.session-token'
       : req.cookies.get('authjs.session-token')
         ? 'authjs.session-token'
         : undefined;
 
-    console.log(`cookieName: ${cookieName}`);
-
+    // localとvercelでgetTokenで取得しに行くcookieの名前がずれるのでcookineNameを渡してあげる必要があった
+    // なぜずれるかというと本番はhttpsだからAuth.jsが`__Secure-`のプレフィックスを付けるから
     const token = await getToken({
       req,
       secret: process.env['NEXTAUTH_SECRET']!,

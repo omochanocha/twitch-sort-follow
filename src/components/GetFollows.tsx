@@ -10,7 +10,9 @@ export const GetFollows: React.FC<{ after: string }> = async ({ after = '' }) =>
   const cookieHeader = (await cookies())
     .getAll()
     .map((c) => `${c.name}=${c.value}`)
-    .join('; ');
+    .join('; '); // joinは配列を文字列に変換する、その際引数に区切り文字を指定することができる(https://qiita.com/yasu-hoshi/items/f1189fd78e86dd402c6c)
+
+  console.log(await cookies());
 
   const url = new URL(`${API_BASE_URL}/api/twitch`);
 

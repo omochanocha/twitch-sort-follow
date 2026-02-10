@@ -4,6 +4,7 @@ import { getToken } from 'next-auth/jwt';
 // トークンをフロントに出したくないのでRoute Handlerを使用
 export const GET = async (req: NextRequest): Promise<NextResponse> => {
   try {
+    // GetFollowsで渡されたcookieを受け取る
     const cookieName = req.cookies.get('__Secure-authjs.session-token')
       ? '__Secure-authjs.session-token'
       : req.cookies.get('authjs.session-token')

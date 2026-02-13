@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 
-import { FollowsChannel } from '@/types';
+import Image from 'next/image';
+
+import { TwitchResponse, TwitchResponseList } from '@/types';
 
 import { Card, CardTitle } from './ui/card';
 import {
@@ -21,24 +23,24 @@ type SortKey = 'followd_desc' | 'followd_asc' | 'name_desc' | 'name_asc';
 // Collatorを作るとオプションがDRYになる、あと何回も比較するのに毎回比較器（比較する環境的なもの？）を作らなくて良くなる
 const collator = new Intl.Collator('ja', { numeric: true, sensitivity: 'base' });
 
-export const ShowFollowChannel: React.FC<{ initialData: FollowsChannel[] }> = ({ initialData }) => {
-  const [followChannel, setFollowChannel] = useState<FollowsChannel[]>(initialData);
+export const ShowFollowChannel: React.FC<{ initialData: TwitchResponseList }> = ({
+  initialData,
+}) => {
+  const [followChannel, setFollowChannel] = useState<TwitchResponseList>(initialData);
 
   const getCompare = (sortKey: SortKey) => {
     switch (sortKey) {
       case 'followd_desc':
-        return (a: FollowsChannel, b: FollowsChannel) => b.followed_at.localeCompare(a.followed_at);
+        return (a: TwitchResponse, b: TwitchResponse) => b.followed_at.localeCompare(a.followed_at);
 
       case 'followd_asc':
-        return (a: FollowsChannel, b: FollowsChannel) => a.followed_at.localeCompare(b.followed_at);
+        return (a: TwitchResponse, b: TwitchResponse) => a.followed_at.localeCompare(b.followed_at);
 
       case 'name_desc':
-        return (a: FollowsChannel, b: FollowsChannel) =>
-          collator.compare(a.broadcaster_login, b.broadcaster_login);
+        return (a: TwitchResponse, b: TwitchResponse) => collator.compare(a.login, b.login);
 
       case 'name_asc':
-        return (a: FollowsChannel, b: FollowsChannel) =>
-          collator.compare(b.broadcaster_login, a.broadcaster_login);
+        return (a: TwitchResponse, b: TwitchResponse) => collator.compare(b.login, a.login);
     }
   };
 
@@ -63,15 +65,34 @@ export const ShowFollowChannel: React.FC<{ initialData: FollowsChannel[] }> = ({
       </Select>
       <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(350px,100%),1fr))] gap-5">
         {followChannel.map((channel) => (
-          <li key={channel.broadcaster_id}>
-            <Card className="overflow-hidden rounded-3xl border-none dark:hover:bg-card/60">
+          <li key={channel.id}>
+            <Card className="overflow-hidden rounded-3xl border-none hover:[&:not(:has(>a>img))]:bg-card/10 dark:hover:[&:not(:has(>a>img))]:bg-card/60">
               <a
-                href={`https://www.twitch.tv/${channel.broadcaster_login}`}
+                href={`https://www.twitch.tv/${channel.login}`}
                 target="_blank"
                 rel="noreferrer"
-                className="grid p-4"
+                className="group relative grid grid-cols-[max-content,1fr] items-center gap-x-3 p-4 backdrop-blur"
               >
-                <CardTitle>{channel.broadcaster_name}</CardTitle>
+                {/* {channel.offline_image_url && (
+                  <Image
+                    src={channel.offline_image_url ?? ''}
+                    alt={channel.login}
+                    width={800}
+                    height={800}
+                    className="absolute inset-0 size-full object-cover blur-sm transition-transform duration-300 ease-in-out group-hover:scale-110"
+                  />
+                )} */}
+                <div className="relative overflow-hidden rounded-full">
+                  <Image
+                    src={channel.profile_image_url}
+                    alt={channel.login}
+                    width={40}
+                    height={40}
+                  />
+                </div>
+                <CardTitle className="relative mix-blend-difference">
+                  {channel.display_name}
+                </CardTitle>
               </a>
             </Card>
           </li>

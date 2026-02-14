@@ -3,6 +3,26 @@ import { getToken } from 'next-auth/jwt';
 
 import { FollowsResponseSchema, UsersResponseSchema } from '@/types';
 
+const TWITCH_API_BASE = 'https://api.twitch.tv/helix';
+
+function twitchError(where: string, res: Response, body: string) {
+  const status = res.status;
+  return NextResponse.json(
+    { ok: false, where, status, body },
+    { status: status === 401 || status === 403 ? 401 : 502 },
+  );
+}
+
+async function twitchFetch(url: URL, accessToken: string) {
+  return fetch(url.toString(), {
+    cache: 'no-store',
+    headers: {
+      'Client-Id': process.env['AUTH_TWITCH_ID']!,
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+}
+
 // トークンをフロントに出したくないのでRoute Handlerを使用
 export const GET = async (req: NextRequest): Promise<NextResponse> => {
   try {
@@ -28,12 +48,16 @@ export const GET = async (req: NextRequest): Promise<NextResponse> => {
       );
     }
 
-    const userId = token?.twitchUserId;
+    const loginUserId = token?.twitchUserId;
     const accessToken = token?.twitchAccessToken;
 
-    if (userId == null || accessToken == null) {
+    if (loginUserId == null || accessToken == null) {
       return NextResponse.json(
-        { ok: false, where: 'token', reason: 'missing twitchUserId/twitchAccessToken' },
+        {
+          ok: false,
+          where: 'loginUserId/accessToken',
+          reason: 'missing twitchUserId/twitchAccessToken',
+        },
         { status: 401 },
       );
     }
@@ -42,65 +66,50 @@ export const GET = async (req: NextRequest): Promise<NextResponse> => {
     const first = searchParams.get('first');
     const after = searchParams.get('after');
 
-    const url = new URL('https://api.twitch.tv/helix/channels/followed');
+    const followsUrl = new URL(`${TWITCH_API_BASE}/channels/followed`);
     // const url = new URL('https://api.twitch.tv/helix/streams/followed'); // 配信中のチャンネル一覧
-    url.searchParams.set('user_id', userId);
-    if (first != null && first !== '') url.searchParams.set('first', first);
-    if (after != null && after !== '') url.searchParams.set('after', after);
+    followsUrl.searchParams.set('user_id', loginUserId);
+    if (first != null) followsUrl.searchParams.set('first', String(Math.min(parseInt(first), 100)));
+    if (after != null) followsUrl.searchParams.set('after', after);
 
-    const res = await fetch(url.toString(), {
-      headers: {
-        'Client-Id': process.env['AUTH_TWITCH_ID']!,
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (!res.ok) {
-      const body = await res.text();
-
-      const status = res.status;
-      return NextResponse.json(
-        { ok: false, where: 'twitch', status, body },
-        { status: status === 401 || status === 403 ? 401 : 502 },
-      );
+    const followsRes = await twitchFetch(followsUrl, accessToken);
+    if (!followsRes.ok) {
+      const body = await followsRes.text();
+      return twitchError('twitch:channels/followed', followsRes, body);
     }
 
-    const followsRaw = await res.json();
-    const follows = FollowsResponseSchema.parse(followsRaw);
+    const follows = FollowsResponseSchema.parse(await followsRes.json());
 
-    const ids = follows.data.map((obj) => obj.broadcaster_id).join('&id=');
-    const resUsers = await fetch(`https://api.twitch.tv/helix/users?id=${ids}`, {
-      headers: {
-        'Client-Id': process.env['AUTH_TWITCH_ID']!,
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-
-    if (!resUsers.ok) {
-      const body = await resUsers.text();
-
-      const status = resUsers.status;
-      return NextResponse.json(
-        { ok: false, where: 'twitch', status, body },
-        { status: status === 401 || status === 403 ? 401 : 502 },
-      );
+    if (follows.data.length === 0) {
+      return NextResponse.json([], { status: 200 });
     }
 
-    const usersRaw = await resUsers.json();
-    const users = UsersResponseSchema.parse(usersRaw);
+    const usersUrl = new URL(`${TWITCH_API_BASE}/users`);
+    for (const f of follows.data) usersUrl.searchParams.append('id', f.broadcaster_id);
 
-    const data = follows.data.map((obj1) => {
-      const matchedUser = users.data.find((obj2) => obj1.broadcaster_id === obj2.id);
-      if (matchedUser == null) return;
-      return {
-        id: matchedUser.id,
-        display_name: matchedUser.display_name,
-        login: matchedUser.login,
-        profile_image_url: matchedUser.profile_image_url,
-        offline_image_url: matchedUser.offline_image_url,
-        followed_at: obj1.followed_at,
-      };
-    });
+    const usersRes = await twitchFetch(usersUrl, accessToken);
+    if (!usersRes.ok) {
+      const body = await usersRes.text();
+      return twitchError('twitch:users', usersRes, body);
+    }
+
+    const users = UsersResponseSchema.parse(await usersRes.json());
+    const userById = new Map(users.data.map((u) => [u.id, u] as const));
+
+    const data = follows.data
+      .map((f) => {
+        const u = userById.get(f.broadcaster_id);
+        if (!u) return;
+        return {
+          id: u.id,
+          display_name: u.display_name,
+          login: u.login,
+          profile_image_url: u.profile_image_url,
+          offline_image_url: u.offline_image_url,
+          followed_at: f.followed_at,
+        };
+      })
+      .filter((x) => x != null);
 
     return NextResponse.json(data, { status: 200 });
   } catch (err) {

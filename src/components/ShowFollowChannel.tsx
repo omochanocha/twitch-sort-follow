@@ -90,7 +90,7 @@ export const ShowFollowChannel: React.FC<{ initialData: TwitchResponseList }> = 
                     height={40}
                   />
                 </div>
-                <CardTitle className="relative mix-blend-difference">
+                <CardTitle className="relative line-clamp-2 mix-blend-difference">
                   {channel.display_name}
                 </CardTitle>
               </a>

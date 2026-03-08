@@ -52,7 +52,7 @@ export const GET = async (req: NextRequest): Promise<NextResponse> => {
     const loginUserId = token.twitchUserId;
 
     let accessToken = token.twitchAccessToken;
-    const refreshToken = token.twitchRefreshToken;
+    let refreshToken = token.twitchRefreshToken;
     const expires = token.twitchAccessTokenExpires;
 
     const isExpired = typeof expires !== 'number' || Date.now() >= expires - 60_000;
@@ -68,6 +68,9 @@ export const GET = async (req: NextRequest): Promise<NextResponse> => {
       try {
         const refreshed = await refreshTwitchAccessToken(refreshToken);
         accessToken = refreshed.access_token;
+        if (refreshed.refresh_token != null) {
+          refreshToken = refreshed.refresh_token;
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err);
         return NextResponse.json({ ok: false, where: 'refresh', message }, { status: 401 });

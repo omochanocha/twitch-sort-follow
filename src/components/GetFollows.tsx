@@ -6,7 +6,7 @@ import { TwitchResponseListSchema } from '@/types';
 import { API_BASE_URL } from '../constants';
 import { ShowFollowChannel } from './ShowFollowChannel';
 
-export async function GetFollows({ after = '' }: { after: string }): Promise<React.JSX.Element> {
+export async function GetFollows({ after = '' }: { after?: string }): Promise<React.JSX.Element> {
   // route handler側でsession情報が取れないのでcookieを渡す
   const cookieHeader = (await cookies())
     .getAll()

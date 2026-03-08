@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
+import { refreshTwitchAccessToken } from '@/lib/refreshToken';
 import { FollowsResponseSchema, UsersResponseSchema } from '@/types';
 
 const TWITCH_API_BASE = 'https://api.twitch.tv/helix';
 
-function twitchError(where: string, res: Response, body: string) {
+function twitchError(where: string, res: Response, body: string, debug?: unknown) {
   const status = res.status;
   return NextResponse.json(
-    { ok: false, where, status, body },
+    { ok: false, where, status, body, debug },
     { status: status === 401 || status === 403 ? 401 : 502 },
   );
 }
@@ -48,8 +49,30 @@ export const GET = async (req: NextRequest): Promise<NextResponse> => {
       );
     }
 
-    const loginUserId = token?.twitchUserId;
-    const accessToken = token?.twitchAccessToken;
+    const loginUserId = token.twitchUserId;
+
+    let accessToken = token.twitchAccessToken;
+    const refreshToken = token.twitchRefreshToken;
+    const expires = token.twitchAccessTokenExpires;
+
+    const isExpired = typeof expires !== 'number' || Date.now() >= expires - 60_000;
+
+    if (isExpired) {
+      if (refreshToken == null) {
+        return NextResponse.json(
+          { ok: false, where: 'refresh', reason: 'missing refresh token' },
+          { status: 401 },
+        );
+      }
+
+      try {
+        const refreshed = await refreshTwitchAccessToken(refreshToken);
+        accessToken = refreshed.access_token;
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return NextResponse.json({ ok: false, where: 'refresh', message }, { status: 401 });
+      }
+    }
 
     if (loginUserId == null || accessToken == null) {
       return NextResponse.json(
@@ -72,10 +95,27 @@ export const GET = async (req: NextRequest): Promise<NextResponse> => {
     if (first != null) followsUrl.searchParams.set('first', String(Math.min(parseInt(first), 100)));
     if (after != null) followsUrl.searchParams.set('after', after);
 
-    const followsRes = await twitchFetch(followsUrl, accessToken);
+    let followsRes = await twitchFetch(followsUrl, accessToken);
+
+    if (followsRes.status === 401 && refreshToken != null) {
+      try {
+        const refreshed = await refreshTwitchAccessToken(refreshToken);
+        accessToken = refreshed.access_token;
+        followsRes = await twitchFetch(followsUrl, accessToken);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err);
+        return NextResponse.json({ ok: false, where: 'refresh-retry', message }, { status: 401 });
+      }
+    }
+
     if (!followsRes.ok) {
       const body = await followsRes.text();
-      return twitchError('twitch:channels/followed', followsRes, body);
+      const hasRefresh = token.twitchRefreshToken != null ? true : false;
+      const expires = token.twitchAccessTokenExpires;
+      const now = Date.now();
+      const diffMs = expires != null ? expires - now : null;
+      const debug = { now, expires, hasRefresh, diffMs, cookieName };
+      return twitchError('twitch:channels/followed', followsRes, body, debug);
     }
 
     const follows = FollowsResponseSchema.parse(await followsRes.json());

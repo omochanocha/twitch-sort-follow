@@ -2,28 +2,7 @@ import NextAuth from 'next-auth';
 import Twitch from 'next-auth/providers/twitch';
 
 import { TOKEN_REFRESH_BUFFER_MS } from './constants';
-
-async function refreshTwitchAccessToken(refreshToken: string) {
-  const res = await fetch('https://id.twitch.tv/oauth2/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-      client_id: process.env['AUTH_TWITCH_ID']!,
-      client_secret: process.env['AUTH_TWITCH_SECRET']!,
-    }),
-  });
-
-  const json = await res.json();
-  if (!res.ok) throw new Error(JSON.stringify(json));
-
-  return json as {
-    access_token: string;
-    refresh_token?: string;
-    expires_in: number;
-  };
-}
+import { refreshTwitchAccessToken } from './lib/refreshToken';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -41,7 +20,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   session: { strategy: 'jwt' },
   callbacks: {
     async jwt({ token, account }) {
-      // サインイン直後だけ account が来る
       if (account?.provider === 'twitch') {
         token.twitchUserId = account.providerAccountId;
         token.twitchAccessToken = account.access_token as string;
@@ -80,7 +58,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.twitchAccessToken = refreshed.access_token;
         token.twitchAccessTokenExpires = Date.now() + refreshed.expires_in * 1000;
         token.twitchError = undefined;
-      } catch {
+        if (refreshed.refresh_token != null) {
+          token.twitchRefreshToken = refreshed.refresh_token;
+        }
+      } catch (err) {
+        console.error('Failed to refresh Twitch token', err);
         token.twitchError = 'RefreshFailed';
       }
 

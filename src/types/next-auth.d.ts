@@ -6,7 +6,7 @@ declare module 'next-auth' {
       // 追加の型定義を書ける
       id: string;
     };
-    twitchError?: 'RefreshFailed' | undefined;
+    twitchError: 'RefreshFailed' | undefined;
   }
 }
 

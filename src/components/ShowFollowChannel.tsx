@@ -48,6 +48,10 @@ export const ShowFollowChannel: React.FC<{ initialData: TwitchResponseList }> = 
     setFollowChannel((prev) => prev.toSorted(getCompare(e)));
   };
 
+  if (initialData.length === 0) {
+    return <h2 className="text-center text-xl">フォローしているチャンネルがいません</h2>;
+  }
+
   return (
     <div className="grid gap-y-4">
       <Select onValueChange={(e: SortKey) => handleOnChange(e)}>

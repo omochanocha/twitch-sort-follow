@@ -1,6 +1,6 @@
 import React, { Suspense } from 'react';
 
-import { CardSkeleton } from '../components/CardSkelton';
+import { CardSkeleton } from '../components/CardSkeleton';
 import { GetFollows } from '../components/GetFollows';
 
 export default function Home(): React.JSX.Element {

@@ -82,6 +82,10 @@ body {
   /* @apply bg-background text-foreground; */
 }
 
+:root {
+  scrollbar-gutter: stable;
+}
+
 @layer base {
   * {
     @apply border-border;

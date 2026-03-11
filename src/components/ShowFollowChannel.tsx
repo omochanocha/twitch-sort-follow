@@ -77,15 +77,18 @@ export const ShowFollowChannel: React.FC<{ initialData: TwitchResponseList }> = 
                 rel="noreferrer"
                 className="group relative grid grid-cols-[max-content,1fr] items-center gap-x-3 p-4 backdrop-blur"
               >
-                {/* {channel.offline_image_url && (
-                  <Image
-                    src={channel.offline_image_url ?? ''}
-                    alt={channel.login}
-                    width={800}
-                    height={800}
-                    className="absolute inset-0 size-full object-cover blur-sm transition-transform duration-300 ease-in-out group-hover:scale-110"
-                  />
-                )} */}
+                {channel.offline_image_url && (
+                  <>
+                    <Image
+                      src={channel.offline_image_url ?? ''}
+                      alt={channel.login}
+                      width={800}
+                      height={800}
+                      className="absolute inset-0 size-full object-cover transition-transform duration-300 ease-in-out group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-white/40 backdrop-blur-[2px] dark:bg-black/40" />
+                  </>
+                )}
                 <div className="relative overflow-hidden rounded-full">
                   <Image
                     src={channel.profile_image_url}
@@ -94,7 +97,7 @@ export const ShowFollowChannel: React.FC<{ initialData: TwitchResponseList }> = 
                     height={40}
                   />
                 </div>
-                <CardTitle className="relative line-clamp-2 mix-blend-difference">
+                <CardTitle className="relative line-clamp-2 text-card-foreground drop-shadow-sm">
                   {channel.display_name}
                 </CardTitle>
               </a>

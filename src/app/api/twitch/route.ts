@@ -137,6 +137,10 @@ export const GET = async (req: NextRequest): Promise<NextResponse> => {
     }
 
     const users = UsersResponseSchema.parse(await usersRes.json());
+
+    /**
+     * userのidをキーに、バリューにはそのidのuserのデータいろいろを持つようなMapオブジェクト
+     */
     const userById = new Map(users.data.map((u) => [u.id, u] as const));
 
     const data = follows.data
